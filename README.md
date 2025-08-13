@@ -122,29 +122,94 @@ kubectl set image deployment/my-webapp webapp=my-webapp:v2
 kubectl rollout status deployment/my-webapp
 ```
 
-## Option B: AWS EKS Setup (Optional)
+
+## 🚀 Production Deployment on AWS EKS
+
+This section guides you through deploying your Node.js app to a real AWS EKS cluster, using AWS ECR for image storage. This is a production-like, portfolio-quality workflow.
 
 ### 1. Set Up EKS Cluster
 
 ```bash
+# Make the setup script executable and run it (creates EKS cluster, configures kubectl)
 chmod +x eks-setup.sh
 ./eks-setup.sh
 ```
 
-### 2. Push Image to ECR
+### 2. Create an ECR Repository
 
 ```bash
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin [ACCOUNT-ID].dkr.ecr.us-east-1.amazonaws.com
-docker tag my-webapp:latest [ACCOUNT-ID].dkr.ecr.us-east-1.amazonaws.com/my-webapp:latest
-docker push [ACCOUNT-ID].dkr.ecr.us-east-1.amazonaws.com/my-webapp:latest
+# Replace <your-repo-name> with a unique name (e.g., my-webapp)
+aws ecr create-repository --repository-name <your-repo-name> --region us-east-1
 ```
 
-### 3. Update EKS Configuration
+### 3. Build, Tag, and Push Docker Image to ECR
 
 ```bash
-# Edit k8s/app.yaml to use the ECR image
+# Get your AWS account ID
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+REGION=us-east-1
+REPO_NAME=<your-repo-name> # Use the name from the previous step
+
+# Authenticate Docker to your ECR registry
+aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+
+# Build your Docker image
+docker build -t $REPO_NAME:latest .
+
+# Tag the image for ECR
+docker tag $REPO_NAME:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
+
+# Push the image to ECR
+docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
+```
+
+### 4. Update Kubernetes Manifest
+
+Edit `k8s/app.yaml` and set the image field to your ECR image:
+
+```yaml
+image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<REPO_NAME>:latest
+```
+
+### 5. Deploy to EKS
+
+```bash
 kubectl apply -f k8s/app.yaml
+kubectl get pods
+kubectl get services
 ```
+
+### 6. Access Your Application
+
+If your service is of type `LoadBalancer`, get the external IP:
+
+```bash
+kubectl get services my-webapp-service
+# Wait for EXTERNAL-IP, then open in your browser
+```
+
+### 7. Clean Up AWS Resources
+
+```bash
+# Delete Kubernetes resources
+kubectl delete -f k8s/app.yaml
+
+# Delete the EKS cluster
+eksctl delete cluster --name my-webapp-cluster --region us-east-1
+
+# (Optional) Delete the ECR repository and images
+aws ecr delete-repository --repository-name <your-repo-name> --region us-east-1 --force
+```
+
+---
+
+**Troubleshooting Tips:**
+- Make sure your AWS CLI is configured (`aws configure`).
+- Use IAM credentials with EKS/ECR permissions.
+- If `kubectl` or `eksctl` are missing, install them as described above.
+- Check AWS Console for EKS/ECR status and error messages.
+
+---
 
 ## Useful Kubernetes Commands
 

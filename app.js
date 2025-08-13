@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3001;
 // Simple home page
 app.get('/', (req, res) => {
   res.send(`
-    <h1>🚀 Kevins AWS DevOps Web App</h1>
+    <h1>🚀 My AWS DevOps Web App</h1>
     <p>This app was deployed automatically to AWS ECS!</p>
     <p>Environment: ${process.env.ENVIRONMENT || 'development'}</p>
     <p>Current time: ${new Date().toLocaleString()}</p>

@@ -1,28 +1,8 @@
-### Step 1: Copy Your App from Project 2
-
-```bash
-# Copy your application files
-cp ../project-2-cicd-pipeline/app.js .
-cp ../project-2-cicd-pipeline/package.json .
-cp ../project-2-cicd-pipeline/Dockerfile .
-```
-
 
 # Project 3: Kubernetes Container Orchestration
 
 ---
 
-## 📸 Screenshots
-
-Add your deployment and AWS Console screenshots to the `screenshots/` folder. Include:
-- EKS cluster and node group status
-- ECR repository with your image
-- Running pods and services in Kubernetes
-- Application running in browser (if possible)
-
----
-
-Learn to run your web application on Kubernetes for scalability and reliability.
 
 ## What This Does
 
@@ -137,8 +117,6 @@ kubectl rollout status deployment/my-webapp
 
 
 ## 🚀 Production Deployment on AWS EKS
-
-This section guides you through deploying your Node.js app to a real AWS EKS cluster, using AWS ECR for image storage. This is a production-like, portfolio-quality workflow.
 
 ### 1. Set Up EKS Cluster
 
@@ -357,12 +335,3 @@ eksctl delete cluster --name my-webapp-cluster --region us-east-1
 * High availability and zero-downtime deploys
 * Traffic-based scaling
 * Resilient production systems
-
-## Next Steps
-
-* Learn about Kubernetes namespaces
-* Explore Helm for deployment automation
-* Study Ingress controllers for routing
-* Move on to Project 4: Monitoring and Observability
-
-🎉 **Congratulations! You're now running scalable apps on Kubernetes!**

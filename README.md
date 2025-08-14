@@ -7,7 +7,20 @@ cp ../project-2-cicd-pipeline/package.json .
 cp ../project-2-cicd-pipeline/Dockerfile .
 ```
 
+
 # Project 3: Kubernetes Container Orchestration
+
+---
+
+## 📸 Screenshots
+
+Add your deployment and AWS Console screenshots to the `screenshots/` folder. Include:
+- EKS cluster and node group status
+- ECR repository with your image
+- Running pods and services in Kubernetes
+- Application running in browser (if possible)
+
+---
 
 Learn to run your web application on Kubernetes for scalability and reliability.
 
@@ -138,8 +151,8 @@ chmod +x eks-setup.sh
 ### 2. Create an ECR Repository
 
 ```bash
-# Replace <your-repo-name> with a unique name (e.g., my-webapp)
-aws ecr create-repository --repository-name <your-repo-name> --region us-east-1
+# Replace <your-repo-name> with your actual repo name (e.g., my-webapp, no angle brackets)
+aws ecr create-repository --repository-name my-webapp --region us-east-1
 ```
 
 ### 3. Build, Tag, and Push Docker Image to ECR
@@ -148,7 +161,7 @@ aws ecr create-repository --repository-name <your-repo-name> --region us-east-1
 # Get your AWS account ID
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 REGION=us-east-1
-REPO_NAME=<your-repo-name> # Use the name from the previous step
+REPO_NAME=my-webapp # Use the name from the previous step
 
 # Authenticate Docker to your ECR registry
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
@@ -158,17 +171,16 @@ docker build -t $REPO_NAME:latest .
 
 # Tag the image for ECR
 docker tag $REPO_NAME:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
-
 # Push the image to ECR
 docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest
 ```
 
 ### 4. Update Kubernetes Manifest
 
-Edit `k8s/app.yaml` and set the image field to your ECR image:
+Edit `k8s/app.yaml` and set the image field to your ECR image (replace with your actual values):
 
 ```yaml
-image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<REPO_NAME>:latest
+image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-webapp:latest
 ```
 
 ### 5. Deploy to EKS
